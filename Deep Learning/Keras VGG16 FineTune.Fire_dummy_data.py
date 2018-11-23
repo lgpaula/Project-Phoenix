@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import keras
 from keras.preprocessing.image import ImageDataGenerator, load_img
 
-Fire_DIR = 'J:/google-images-deep-learning/downloads/forest fire'
-Truck_DIR = 'J:/google-images-deep-learning/downloads/firetruck'
-TEST_DIR = 'J:/google-images-deep-learning/downloads/wildfire'
+Fire_DIR = 'J:/google-images-deep-learning/downloads/fire'
+Truck_DIR = 'J:/google-images-deep-learning/images'
+TEST_DIR = 'J:/test'
 Fire_lable = [0,1]
 Truck_lable = [1,0]
 image_size = 224
@@ -143,7 +143,7 @@ validation_generator = val_datagen.flow(np.array(test_x), test_y, batch_size=bat
 history = model.fit_generator(
     train_generator, 
     steps_per_epoch=nb_train_samples // batch_size,
-    epochs=5,
+    epochs=50,
     validation_data=validation_generator,
     validation_steps=nb_validation_samples // batch_size,
     verbose=4)
@@ -156,6 +156,20 @@ with open("model.json", "w") as json_file:
 # serialize weights to HDF5
 model.save_weights("model.h5")
 print("Saved model to disk")
+
+from keras.models import model_from_json
+# later...
+ # load json and create model
+json_file = open('model.json', 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+loaded_model = model_from_json(loaded_model_json)
+# load weights into new model
+loaded_model.load_weights("model.h5")
+print("Loaded model from disk")
+ 
+
+
 # Plot the accuracy and loss curves
 acc = history.history['acc']
 val_acc = history.history['val_acc']
@@ -190,14 +204,14 @@ test_data = testing_data
 
 fig=plt.figure()
 
-for num,data in enumerate(test_data[:12]):
+for num,data in enumerate(test_data[:25]):
     # cat: [1,0]
     # dog: [0,1]
     
     img_num = data[1]
     img_data = data[0]
     
-    y = fig.add_subplot(3,4,num+1)
+    y = fig.add_subplot(5,5,num+1)
     orig = img_data
     data = img_data.reshape(-1,image_size,image_size,3)
     #model_out = model.predict([data])[0]
