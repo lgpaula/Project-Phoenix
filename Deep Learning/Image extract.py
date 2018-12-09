@@ -19,7 +19,7 @@ def img_extractor(img, pic_num):
     
     kernel_open = np.ones((10,10), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open)
-    kernel_dilute = np.ones((20,20), np.uint8)
+    kernel_dilute = np.ones((50,50), np.uint8)
     img_dilation = cv2.dilate(mask, kernel_dilute, iterations=1)
     
     im2,ctrs, hier = cv2.findContours(img_dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
@@ -52,30 +52,42 @@ def img_extractor(img, pic_num):
         x1= x-cap
         y1= y-cap
         T= T+cap*2
+        if T > width:
+            T = width-10
+        if T > height:
+            T = height-10
         if x1 < 0:
             x1 = 0
         if y1 < 0:
             y1 = 0
         if x1+T > width:
-            x1 = width - T-1
-        if y1+T > height:
-            y1 = height -T-1
-        
+            x1 = width - T
+        if y1+T > width:
+            y1 = height -T
+
             # Getting ROI 
-        if T>150: 
-              
-#            cv2.rectangle(img,(x,y),( x + w, y + h ),(0,255,0),2) 
-            
-        #        crop_img = img[y:y+h, x:x+w]         
+        if T>224:        
             pic_num += 1
             roi = img_copy[y1:y1+T, x1:x1+T]
-            IMG = cv2.resize(roi, (image_size,image_size))
-            cv2.imwrite("img//"+str(pic_num)+".jpg",IMG)        
+            print("y1 "+str(y1)+" x1 "+str(x1)+" T "+str(T)+" width "+str(width)+" height "+str(height))
+            roi = cv2.resize(roi, (image_size,image_size))
+            
+            hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+            lower = np.array([0, 100, 100])
+            upper = np.array([50, 255, 255])
+            mask = cv2.inRange(hsv, lower, upper)
+
+            
+            kernel_open = np.ones((10,10), np.uint8)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open)
+            this = cv2.countNonZero(mask)
+            if this > 0:
+                cv2.imwrite("img//"+str(pic_num)+".jpg",roi)        
 #            cv2.imshow("img//"+str(pic_num)+".jpg",roi)
             
     return pic_num
             
-DIR = 'C:/Users/Pikaa/Videos/img_frame'
+DIR = 'J:/Fire'
 def create_train_data(DIR):
     pic_num = 0
     for img in os.listdir(DIR):
