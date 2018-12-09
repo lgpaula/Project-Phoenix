@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import keras
 from keras.preprocessing.image import ImageDataGenerator, load_img
 
-Fire_DIR = 'J:/google-images-deep-learning/downloads/fire'
-Truck_DIR = 'J:/google-images-deep-learning/images'
+Fire_DIR = 'J:/google-images-deep-learning/downloads/forest fire'
+Truck_DIR = 'J:/google-images-deep-learning/downloads/firetruck'
 TEST_DIR = 'J:/test'
 Fire_lable = [0,1]
 Truck_lable = [1,0]
@@ -20,7 +20,7 @@ def create_train_data(TRAIN_DIR, label):
     training_data = []
     for img in tqdm(os.listdir(TRAIN_DIR)):
         path = os.path.join(TRAIN_DIR,img)
-#        print(path)
+        print(path)
         img = cv2.imread(path)
         img = cv2.resize(img, (image_size,image_size))
         training_data.append([np.array(img),np.array(label)])
@@ -47,6 +47,9 @@ train_data=[]
 train_data.extend(Fire_data)
 train_data.extend(Truck_data)
 np.save('train_data.npy', train_data)
+train_data = np.load('train_data.npy')
+    
+
 shuffle(train_data)
     
 train = train_data[:-100]
