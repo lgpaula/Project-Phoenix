@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import keras
 from keras.preprocessing.image import ImageDataGenerator, load_img
 
-Fire_DIR = 'J:/google-images-deep-learning/downloads/fire'
-Truck_DIR = 'J:/google-images-deep-learning/images'
-TEST_DIR = 'J:/test'
+Fire_DIR = 'C:/Users/Pikaa/Documents/GitHub/Project-Phoenix/Deep Learning/DM-Unsorted'
+Truck_DIR = 'C:/Users/Pikaa/Documents/GitHub/Project-Phoenix/Deep Learning/Fire -Unsorted'
+#TEST_DIR = 'J:/test'
 Fire_lable = [0,1]
 Truck_lable = [1,0]
 image_size = 224
@@ -19,34 +19,39 @@ image_size = 224
 def create_train_data(TRAIN_DIR, label):
     training_data = []
     for img in tqdm(os.listdir(TRAIN_DIR)):
+        if img =="Thumbs.db":
+            break
         path = os.path.join(TRAIN_DIR,img)
-#        print(path)
+        print(path)
         img = cv2.imread(path)
         img = cv2.resize(img, (image_size,image_size))
         training_data.append([np.array(img),np.array(label)])
     shuffle(training_data)
     np.save('train_data.npy', training_data)
     return training_data
-def process_test_data(TEST_DIR):
-    testing_data = []
-    for img in tqdm(os.listdir(TEST_DIR)):
-        path = os.path.join(TEST_DIR,img)
-        img_num = img.split('.')[0]
-        img = cv2.imread(path)
-        img = cv2.resize(img, (image_size,image_size))
-        testing_data.append([np.array(img), img_num])   
-        
-    shuffle(testing_data)
-    np.save('test_data.npy', testing_data)
-    return testing_data
+#def process_test_data(TEST_DIR):
+#    testing_data = []
+#    for img in tqdm(os.listdir(TEST_DIR)):
+#        path = os.path.join(TEST_DIR,img)
+#        img_num = img.split('.')[0]
+#        img = cv2.imread(path)
+#        img = cv2.resize(img, (image_size,image_size))
+#        testing_data.append([np.array(img), img_num])   
+#        
+#    shuffle(testing_data)
+#    np.save('test_data.npy', testing_data)
+#    return testing_data
 
 Fire_data = create_train_data(Fire_DIR, Fire_lable)
 Truck_data = create_train_data(Truck_DIR, Truck_lable)
-testing_data =process_test_data(TEST_DIR)
+#testing_data =process_test_data(TEST_DIR)
 train_data=[]
 train_data.extend(Fire_data)
 train_data.extend(Truck_data)
 np.save('train_data.npy', train_data)
+train_data = np.load('train_data.npy')
+    
+
 shuffle(train_data)
     
 train = train_data[:-100]
@@ -114,7 +119,7 @@ train_datagen = ImageDataGenerator(rescale=1./255)
 validation_datagen = ImageDataGenerator(rescale=1./255)
 
 # Change the batchsize according to your system RAM
-train_batchsize = 100
+train_batchsize = 80
 val_batchsize = 10
 
 # Compile the model
@@ -194,34 +199,34 @@ plt.show()
 
 scores = model.evaluate(X, Y, verbose=0)
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-
-import matplotlib.pyplot as plt
-
-# if you need to create the data:
-#test_data = process_test_data()
-# if you already have some saved:
-test_data = testing_data
-
-fig=plt.figure()
-
-for num,data in enumerate(test_data[:25]):
-    # cat: [1,0]
-    # dog: [0,1]
-    
-    img_num = data[1]
-    img_data = data[0]
-    
-    y = fig.add_subplot(5,5,num+1)
-    orig = img_data
-    data = img_data.reshape(-1,image_size,image_size,3)
-    #model_out = model.predict([data])[0]
-    model_out = model.predict([data])[0]
-    
-    if np.argmax(model_out) == 1: str_label='Fire'
-    else: str_label='Truck'
-        
-    y.imshow(orig,cmap='gray')
-    plt.title(str_label)
-    y.axes.get_xaxis().set_visible(False)
-    y.axes.get_yaxis().set_visible(False)
-plt.show()
+#
+#import matplotlib.pyplot as plt
+#
+## if you need to create the data:
+##test_data = process_test_data()
+## if you already have some saved:
+#test_data = testing_data
+#
+#fig=plt.figure()
+#
+#for num,data in enumerate(test_data[:25]):
+#    # cat: [1,0]
+#    # dog: [0,1]
+#    
+#    img_num = data[1]
+#    img_data = data[0]
+#    
+#    y = fig.add_subplot(5,5,num+1)
+#    orig = img_data
+#    data = img_data.reshape(-1,image_size,image_size,3)
+#    #model_out = model.predict([data])[0]
+#    model_out = model.predict([data])[0]
+#    
+#    if np.argmax(model_out) == 1: str_label='Fire'
+#    else: str_label='Truck'
+#        
+#    y.imshow(orig,cmap='gray')
+#    plt.title(str_label)
+#    y.axes.get_xaxis().set_visible(False)
+#    y.axes.get_yaxis().set_visible(False)
+#plt.show()
