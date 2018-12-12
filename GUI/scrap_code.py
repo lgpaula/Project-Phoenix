@@ -30,3 +30,7 @@ win.config(menu=menubar)
 #A frame with highlited borders
 rightFrame = tk.Frame(win, relief='solid', bd=2)
 rightFrame.grid(row=1, column=1, padx=10, pady=10, sticky="ne")
+
+
+#Code to resize images
+img = cv2.resize(imagetoresize, (image_size,image_size))

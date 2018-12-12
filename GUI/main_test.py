@@ -1,14 +1,24 @@
 from tkinter import *
 import tkinter as tk
 from tkinter import messagebox
+from PIL import Image
+from PIL import ImageTk
+from math import ceil
 
 #initiate the instance
 win = tk.Tk()
 #define values to extract the size of the screen
-width_value = win.winfo_screenwidth()
-height_value = win.winfo_screenheight()
+screen_width = win.winfo_screenwidth()
+screen_height = win.winfo_screenheight()
+#screen_width = 1920
+#screen_height = 1080
+
+tenth_w = ceil(0.1*screen_width)
+one_in_fifteen_w = ceil(0.015*screen_width)
+tenth_h = ceil(0.1*screen_height)
+one_in_forty_h = ceil(0.4*screen_height)
 #define the window as full screen in the format "width x height + 0 (x-axis) + 0 (y-axis)"
-win.geometry(f"{width_value}x{height_value}+0+0")
+win.geometry(f"{screen_width}x{screen_height}+0+0")
 #set up some parameters
 win.resizable(False, True)
 win.title("Test GUI")
@@ -16,8 +26,11 @@ win.title("Test GUI")
 win.grid_columnconfigure(0, weight=1)
 win.grid_columnconfigure(1, weight=1)
 
-def dema_intranet():
-    messagebox.showinfo("Announcement", "This button will take you to the streaming server.")
+def img_resize(file, width, height):
+    img = Image.open(file)
+    img = img.resize((width, height), Image.ANTIALIAS)
+    photoImg =  ImageTk.PhotoImage(img)
+    return photoImg
 
 def homeMenu():
     messagebox.showinfo("Announcement", "This button will send the drone home.")
@@ -90,17 +103,18 @@ def login():
 
 
 #create an additional frame for the content on the top-left
-topLeftFrame = tk.Frame(win, width=200, height=100)
+topLeftFrame = tk.Frame(win, relief='solid', bd=2)
 topLeftFrame.grid(row=0, column=0, padx=10, sticky="w")
 
-homeImg = tk.PhotoImage(file="home_icon.png")
-homeb = tk.Button(topLeftFrame, image=homeImg, command=homeMenu , height=100, width=100)
+#homeImg = tk.PhotoImage(file = "home_icon.png")
+homeImg = img_resize("home_icon.png", tenth_h, tenth_h)
+homeb = tk.Button(topLeftFrame, image=homeImg, command=homeMenu, width=tenth_h, height= tenth_h)
 
-rgbmenuImg = tk.PhotoImage(file="rgb_icon.png")
-rgbmenub = tk.Button(topLeftFrame, image=rgbmenuImg, command=rgbmenu, height=100, width=100)
+rgbmenuImg = img_resize("rgb_icon.png", tenth_h, tenth_h)
+rgbmenub = tk.Button(topLeftFrame, image=rgbmenuImg, command=rgbmenu, height=tenth_h, width=tenth_h)
 
-thermalmenuImg = tk.PhotoImage(file="thermal_icon.png")
-thermalmenub = tk.Button(topLeftFrame, image=thermalmenuImg, command=thermalmenu, height=100, width=100)
+thermalmenuImg = img_resize("thermal_icon.png", tenth_h, tenth_h)
+thermalmenub = tk.Button(topLeftFrame, image=thermalmenuImg, command=thermalmenu, height=tenth_h, width=tenth_h)
 
 homeb.grid(row=0, column=0, padx=10, pady=10)
 rgbmenub.grid(row=0, column=1, padx=10, pady=10)
@@ -108,20 +122,20 @@ thermalmenub.grid(row=0, column=2, padx=10, pady=10)
 
 
 #create an additional frame for the content on the top-right
-topRightFrame = tk.Frame(win, width=300, height=100)
-topRightFrame.grid(row=0, column=1, padx=10, sticky="e")
+topRightFrame = tk.Frame(win, relief='solid', bd=2)
+topRightFrame.grid(row=0, column=1, padx=10, sticky="ne")
 
-settImg = tk.PhotoImage(file="settings_icon.png")
-settingb = tk.Button(topRightFrame, image=settImg, command=settings, height=100, width=100)
+settImg = img_resize("settings_icon.png", tenth_h, tenth_h)
+settingb = tk.Button(topRightFrame, image=settImg, command=settings, height=tenth_h, width=tenth_h)
 
-infoImg = tk.PhotoImage(file="copyright_icon.png")
-infob = tk.Button(topRightFrame, image=infoImg, command=copyright, height=100, width=100)
+infoImg = img_resize("copyright_icon.png", tenth_h, tenth_h)
+infob = tk.Button(topRightFrame, image=infoImg, command=copyright, height=tenth_h, width=tenth_h)
 
-loginImg = tk.PhotoImage(file="login_icon.png")
-loginb = tk.Button(topRightFrame, image=loginImg, command=login, height=100, width=100)
+loginImg = img_resize("login_icon.png", tenth_h, tenth_h)
+loginb = tk.Button(topRightFrame, image=loginImg, command=login, height=tenth_h, width=tenth_h)
 
-exitImg = tk.PhotoImage(file="exit_icon.png")
-exitb = tk.Button(topRightFrame, image=exitImg, command=quit, height=100, width=100)
+exitImg = img_resize("exit_icon.png", tenth_h, tenth_h)
+exitb = tk.Button(topRightFrame, image=exitImg, command=quit, height=tenth_h, width=tenth_h)
 
 settingb.grid(row=0, column=0, padx=10, pady=10)
 infob.grid(row=0, column=1, padx=10, pady=10)
@@ -136,21 +150,21 @@ leftFrame.grid(row=1, column=0, padx=10, pady=10, sticky="nw")
 #tk.Button(leftFrame, text="Example 1").grid(row=1, column=0, pady=5)
 
 
-centerFrame = tk.Frame(win)
+centerFrame = tk.Frame(win, relief='solid', bd=2)
 centerFrame.grid(row=1, column=0, padx=10, pady=10, sticky="nw")
 
 mapImg = tk.PhotoImage(file="map_example.png")
 map_label = tk.Label(centerFrame, image=mapImg).grid(row=0, column=0, padx=10, pady=10)
 
 #create an additional frame for the content on the right
-rightFrame = tk.Frame(win)
-rightFrame.grid(row=1, column=2, padx=10, pady=10, sticky="ne")
+rightFrame = tk.Frame(win, relief='solid', bd=2)
+rightFrame.grid(row=1, column=1, padx=10, pady=10, sticky="e")
 
-tempMap = tk.PhotoImage(file="temp_heat_map.png")
+tempMap = img_resize("temp_heat_map.png", one_in_fifteen_w, one_in_forty_h)
 tempMaplab = tk.Label(rightFrame, image=tempMap).grid(row=0, column=0, padx=10, pady=10)
 
 #create an additional frame for the content on the bottom
-bottomFrame = tk.Frame(win)
+bottomFrame = tk.Frame(win, relief='solid', bd=2)
 bottomFrame.grid(row=2, column=0, padx=10, pady=10, sticky="w")
 
 info = """Drone Speed = XXX Km/h   Drone Distance = XXX m   Wind Direction = XX   Wind Force = XX Knots"""
