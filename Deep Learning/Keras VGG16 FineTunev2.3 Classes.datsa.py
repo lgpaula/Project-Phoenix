@@ -150,14 +150,15 @@ def Train_model (X , Y, test_x, test_y, num):
         # Add new layers
         model.add(layers.Flatten())
         model.add(layers.Dense(1024, activation='relu'))
-#        model.add(layers.Dropout(0.3))
+        model.add(layers.Dropout(0.3))
         model.add(layers.Dense(1024, activation='relu'))
         #model.add(layers.Dropout(0.3))
         model.add(layers.Dense(3, activation='softmax'))
         tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
         
-        # Show a summary of the model. Check the number of trainable parameters
-#        model.summary()
+        # Show a summary of the model. Check the number of trainable parameter
+        vgg_conv.summary()
+        model.summary()
         
         
         # No Data augmentation 
@@ -217,5 +218,6 @@ def Train_model (X , Y, test_x, test_y, num):
         #loaded_model.load_weights("model.h5")
         #print("Loaded model from disk")
         #
+        
 X , Y, test_x, test_y = Prepare_dataset()
-Train_model (X , Y, test_x, test_y, 1)
+Train_model (X , Y, test_x, test_y, 10)
