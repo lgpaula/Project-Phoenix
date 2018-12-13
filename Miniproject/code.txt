@@ -1,0 +1,44 @@
+xQA1_RIGHT := 1; // Start moving the conveyor to the right
+
+//PALLET 1
+IF xBG21 = 1 AND id_reader = 16777728 THEN // Check if there's a pallet available and if the RFID-tag matches pallet nr 2	
+	TON_pallet01(IN := TRUE, PT:= T#2S); // Start the TON-timer by setting IN true and let it run for 2 sec
+	IF TON_pallet01.Q = TRUE THEN // Check if the timer's output Q is true
+		xMB20 := 1;	// Lower the barricade and let the pallet pass
+	END_IF
+		ELSE xMB20 := 0;// This is here to keep the barricade up and allow the system to read the tag before the pallet has passed
+END_IF
+
+IF xBG21 = 0 THEN // Check if there's a pallet available
+	TON_pallet01(IN := FALSE); // Set the timer's IN variable to false to reset the timer and its output
+END_IF
+
+// PALLET 2
+IF xBG21 = 1 AND id_reader = 16777984 AND xMB20 = 0 THEN // Check if there's a pallet available and if the RFID-tag matches pallet nr  3
+	xQA1_RIGHT := 0;
+	xQA1_LEFT := 1;
+END_IF
+
+IF xQA1_LEFT = 1 AND xBG21 = 0 THEN
+	TON_pallet02(IN := TRUE , PT:= T#2S);
+END_IF
+
+IF TON_pallet02.Q = TRUE THEN
+	xQA1_LEFT := 0;
+	xQA1_RIGHT := 1;
+	xMB20 := 1;
+	TON_pallet22(IN:=TRUE, PT:=T#3S);
+END_IF
+
+IF TON_pallet22.Q = TRUE AND xMB20 = 1 THEN
+	TON_pallet02(IN:=FALSE);
+	xMB20:=0;
+		IF TON_pallet02.IN = FALSE THEN
+		TON_pallet22(IN:=FALSE);
+		END_IF
+END_IF
+IF xBG21 = 1 AND id_reader1 = 1099528406528 AND State = 3 THEN
+	xMB20 := 1;
+	State := 4;
+	SmallDelay_Start := 1;
+END_IF

@@ -1,0 +1,36 @@
+#Import opencv and numpy (calling them as cv2 and np)
+import cv2
+import numpy as np
+#Import video using opencv and name it as cap
+cap = cv2.VideoCapture('DJI_0079.mp4')
+#cap = cv2.imread('DJI_0136.jpg')
+#This loop ensures that we read frame by frame, where the frame is just an image from the video. Each image is proccessed 
+while(1):
+    # cap.read gives you an array, we ignore first part of the array and assigne second part to varible frame
+    _, frame = cap.read()
+    # we creat the histograme
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # creat the range we want 
+    lower = np.array([0,0,100])
+    upper = np.array([255,255,255])
+    # mask is the image without the pixels that are not in the range we want
+    mask = cv2.inRange(hsv, lower, upper)
+    # if pixel was removed from varible mask is black, if pixel in mask and frame(original image) is same, then it is replaced with white
+    res = cv2.bitwise_and(frame,frame, mask= mask)
+
+    #cv2.imshow('Original',frame)
+    #Extract canny edge
+    edges = cv2.Canny(mask,50,100)
+
+    cv2.imshow('Original',frame)
+    cv2.imshow('Mask[extract color]',mask)
+    cv2.imshow('Res[extract black/white]',res)
+    cv2.imshow('Canny Edge',edges)
+    #wait 5 miliseconds (not realy sure why, but seems either if u press the key it stops, or it's just a delay)
+    k = cv2.waitKey(5) & 0xFF
+    if k == 27:
+        break
+
+
+cv2.destroyAllWindows()
+cap.release()
