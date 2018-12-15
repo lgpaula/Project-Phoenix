@@ -9,6 +9,7 @@ import platform
 import logging as _logging
 from PIL import Image
 from PIL import ImageTk
+from math import ceil
 
 # Fix for PyCharm hints warnings
 WindowUtils = cef.WindowUtils()
@@ -23,14 +24,18 @@ logger = _logging.getLogger("tkinter_.py")
 # Tk 8.5 doesn't support png images
 IMAGE_EXT = ".png" if tk.TkVersion > 8.5 else ".gif"
 
-b_width = 75
-b_height = 75
-i_width = 30
-i_height = 30
-t_width = 38
-t_height = 1.5
+win = tk.Tk()
+win_width = win.winfo_screenwidth()
+win_height = win.winfo_screenheight()
 
-def img_resize(self, file, width, height):
+b_width = ceil(0.04*win_width)
+b_height = ceil(0.07*win_height)
+i_width = ceil(0.02*win_width)
+i_height = ceil(0.04*win_height)
+t_width = ceil(0.025*win_width)
+t_height = ceil(0.0014*win_height)
+
+def img_resize(file, width, height):
     img = Image.open(file)
     img = img.resize((width, height), Image.ANTIALIAS)
     photoImg =  ImageTk.PhotoImage(img)
@@ -498,8 +503,7 @@ if __name__ == '__main__':
     logger.info("Tk {ver}".format(ver=tk.Tcl().eval('info patchlevel')))
     assert cef.__version__ >= "55.3", "CEF Python v55.3+ required to run this"
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-    root = tk.Tk()
-    app = MainFrame(root)
+    app = MainFrame(win)
     # Tk must be initialized before CEF otherwise fatal error (Issue #306)
     cef.Initialize()
 
