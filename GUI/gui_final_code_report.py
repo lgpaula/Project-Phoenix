@@ -10,31 +10,24 @@ import logging as _logging
 from PIL import Image
 from PIL import ImageTk
 
-# Fix for PyCharm hints warnings
 WindowUtils = cef.WindowUtils()
-
-# Platforms
 WINDOWS = (platform.system() == "Windows")
-
-# Globals
 logger = _logging.getLogger("tkinter_.py")
-
-# Constants
-# Tk 8.5 doesn't support png images
 IMAGE_EXT = ".png" if tk.TkVersion > 8.5 else ".gif"
 
-b_width = 75
+b_width =  75
 b_height = 75
 i_width = 30
 i_height = 30
-t_width = 38
-t_height = 1.5
+width_value = "1800"
+height_value = "1200"
 
-def img_resize(self, file, width, height):
+def img_resize(file, width, height):
     img = Image.open(file)
     img = img.resize((width, height), Image.ANTIALIAS)
     photoImg =  ImageTk.PhotoImage(img)
     return photoImg
+
 
 class MainFrame(tk.Frame):
 
@@ -43,14 +36,12 @@ class MainFrame(tk.Frame):
         self.navigation_bar = None
         self.info_frame = None
 
-        # Root
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-        root.geometry(f"{screen_width}x{screen_height}")
+
+        root.geometry(width_value + "x" + height_value)
         tk.Grid.rowconfigure(root, 0, weight=1)
         tk.Grid.columnconfigure(root, 0, weight=1)
 
-        # MainFrame
+
         tk.Frame.__init__(self, root)
         self.master.title("Semi-Autonomous Fire Scout Drone Main Frame User Interface")
         self.master.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -60,28 +51,28 @@ class MainFrame(tk.Frame):
         self.bind("<FocusIn>", self.on_focus_in)
         self.bind("<FocusOut>", self.on_focus_out)
 
-        # NavigationBar
+
         self.navigation_bar = NavigationBar(self)
         self.navigation_bar.grid(row=0, column=0,
                                  sticky=(tk.N + tk.S + tk.E + tk.W))
         tk.Grid.rowconfigure(self, 0, weight=0)
         tk.Grid.columnconfigure(self, 0, weight=0)
 
-        # BrowserFrame
+
         self.browser_frame = BrowserFrame(self, self.navigation_bar)
         self.browser_frame.grid(row=1, column=0,
                                 sticky=(tk.N + tk.S + tk.E + tk.W))
         tk.Grid.rowconfigure(self, 1, weight=1)
         tk.Grid.columnconfigure(self, 0, weight=1)
 
-        # DroneInformationFrame
+
         self.info_frame = InfoFrame(self)
         self.info_frame.grid(row=2, column=0,
                              sticky=(tk.N + tk.S + tk.E + tk.W))
         tk.Grid.rowconfigure(self, 2, weight=0)
         tk.Grid.columnconfigure(self, 0, weight=1)
 
-        # Pack MainFrame
+
         self.pack(fill=tk.BOTH, expand=tk.YES)
 
     def on_root_configure(self, _):
@@ -124,7 +115,6 @@ class MainFrame(tk.Frame):
         icon_path = os.path.join(resources, "tkinter"+IMAGE_EXT)
         if os.path.exists(icon_path):
             self.icon = tk.PhotoImage(file=icon_path)
-            # noinspection PyProtectedMember
             self.master.call("wm", "iconphoto", self.master._w, self.icon)
 
 class BrowserFrame(tk.Frame):
@@ -144,7 +134,7 @@ class BrowserFrame(tk.Frame):
         rect = [0, 0, self.winfo_width(), self.winfo_height()]
         window_info.SetAsChild(self.get_window_handle(), rect)
         self.browser = cef.CreateBrowserSync(window_info,
-                                             url="C:/Users/jdomi/Documents/cefpython/examples/area_map.htm") #todo
+                                             url="C:/Users/jdomi/Documents/cefpython/examples/area_map.htm")
         assert self.browser
         self.browser.SetClientHandler(LoadHandler(self))
         self.browser.SetClientHandler(FocusHandler(self))
@@ -154,18 +144,8 @@ class BrowserFrame(tk.Frame):
         if self.winfo_id() > 0:
             return self.winfo_id()
         elif MAC:
-            # On Mac window id is an invalid negative value (Issue #308).
-            # This is kind of a dirty hack to get window handle using
-            # PyObjC package. If you change structure of windows then you
-            # need to do modifications here as well.
-            # noinspection PyUnresolvedReferences
             from AppKit import NSApp
-            # noinspection PyUnresolvedReferences
             import objc
-            # Sometimes there is more than one window, when application
-            # didn't close cleanly last time Python displays an NSAlert
-            # window asking whether to Reopen that window.
-            # noinspection PyUnresolvedReferences
             return objc.pyobjc_id(NSApp.windows()[-1].contentView())
         else:
             raise Exception("Couldn't obtain window handle")
@@ -179,7 +159,6 @@ class BrowserFrame(tk.Frame):
             self.embed_browser()
 
     def on_root_configure(self):
-        # Root <Configure> event will be called when top window is moved
         if self.browser:
             self.browser.NotifyMoveOrResizeStarted()
 
@@ -210,8 +189,6 @@ class BrowserFrame(tk.Frame):
         self.destroy()
 
     def clear_browser_references(self):
-        # Clear browser references that you keep anywhere in your
-        # code. All references must be cleared for CEF to shutdown cleanly.
         self.browser = None
 
 class LoadHandler(object):
@@ -258,7 +235,7 @@ class NavigationBar(tk.Frame):
         resources = os.path.join(os.path.dirname(__file__), "resources")
         media = os.path.join(os.path.dirname(__file__), "media")
 
-        # Home button
+
         home_png = os.path.join(media, "home"+IMAGE_EXT)
         if os.path.exists(home_png):
             self.home_image = img_resize(home_png, b_width, b_height)
@@ -266,7 +243,7 @@ class NavigationBar(tk.Frame):
                                      command=self.homemenu)
         self.home_button.grid(row=0, column=0, padx = 2.5)
 
-        # Reload button
+
         reload_png = os.path.join(media, "reload"+IMAGE_EXT)
         if os.path.exists(reload_png):
             self.reload_image = img_resize(reload_png, b_width, b_height)
@@ -274,7 +251,7 @@ class NavigationBar(tk.Frame):
                                        command=self.reload)
         self.reload_button.grid(row=0, column=1, padx = 2.5)
 
-        # RGB button
+
         rgb_png = os.path.join(media, "rgb"+IMAGE_EXT)
         if os.path.exists(rgb_png):
             self.rgb_image = img_resize(rgb_png, b_width, b_height)
@@ -282,7 +259,7 @@ class NavigationBar(tk.Frame):
                                        command=self.rgbmenu)
         self.rgb_button.grid(row=0, column=2, padx = 2.5)
 
-        # Thermal button
+
         thermal_png = os.path.join(media, "thermal"+IMAGE_EXT)
         if os.path.exists(thermal_png):
             self.thermal_image = img_resize(thermal_png, b_width, b_height)
@@ -290,18 +267,17 @@ class NavigationBar(tk.Frame):
                                        command=self.thermalmenu)
         self.thermal_button.grid(row=0, column=3, padx = 2.5)
 
-        # Url entry
+
         self.url_entry = tk.Entry(self)
         self.url_entry.bind("<FocusIn>", self.on_url_focus_in)
         self.url_entry.bind("<FocusOut>", self.on_url_focus_out)
         self.url_entry.bind("<Return>", self.on_load_url)
         self.url_entry.bind("<Button-1>", self.on_button1)
-        #self.url_entry.grid(row=0, column=4, padx = 2.5,
-                            #sticky=(tk.N + tk.S + tk.E + tk.W))
+
         tk.Grid.rowconfigure(self, 0, weight=100)
         tk.Grid.columnconfigure(self, 4, weight=100)
 
-        # Settings button
+
         settings_png = os.path.join(media, "settings"+IMAGE_EXT)
         if os.path.exists(settings_png):
             self.settings_image = img_resize(settings_png, b_width, b_height)
@@ -309,7 +285,7 @@ class NavigationBar(tk.Frame):
                                      command=self.settingsmenu)
         self.settings_button.grid(row=0, column=5, padx = 2.5)
 
-        # Info button
+
         info_png = os.path.join(media, "copyright"+IMAGE_EXT)
         if os.path.exists(info_png):
             self.info_image = img_resize(info_png, b_width, b_height)
@@ -317,7 +293,7 @@ class NavigationBar(tk.Frame):
                                      command=self.copyrightmenu)
         self.info_button.grid(row=0, column=6, padx = 2.5)
 
-        # Login button
+
         login_png = os.path.join(media, "login"+IMAGE_EXT)
         if os.path.exists(home_png):
             self.login_image = img_resize(login_png, b_width, b_height)
@@ -325,7 +301,7 @@ class NavigationBar(tk.Frame):
                                      command=self.loginmenu)
         self.login_button.grid(row=0, column=7, padx = 2.5)
 
-        # Exit button
+
         exit_png = os.path.join(media, "exit"+IMAGE_EXT)
         if os.path.exists(exit_png):
             self.exit_image = img_resize(exit_png, b_width, b_height)
@@ -440,48 +416,48 @@ class InfoFrame(tk.Frame):
         self.droneinfoFrame = tk.Frame(self)
         self.droneinfoFrame.grid(row = 2, column = 0, sticky = tk.SW)
 
-        #SpeedInfo
+
         speed_png = os.path.join(media, "speed"+IMAGE_EXT)
         if os.path.exists(speed_png):
             self.speed_image = img_resize(speed_png, i_width, i_height)
         self.speed_imlab = tk.Label(self.droneinfoFrame, image=self.speed_image)
-        self.speed_info = Text(self.droneinfoFrame, height=t_height, width=t_width)
+        self.speed_info = Text(self.droneinfoFrame, height=1.5, width=38)
         self.speed_unit = tk.Label(self.droneinfoFrame, text="Km/h", font = "arial 12 bold")
 
         self.speed_imlab.grid(row=0, column=0, sticky = tk.W)
         self.speed_info.grid(row=0, column=1, sticky = tk.W)
         self.speed_unit.grid(row=0, column=2, sticky= tk.W)
 
-        #DistanceInfo
+
         distance_png = os.path.join(media, "distance"+IMAGE_EXT)
         if os.path.exists(distance_png):
             self.distance_image = img_resize(distance_png, i_width, i_height)
         self.distance_imlab = tk.Label(self.droneinfoFrame, image=self.distance_image)
-        self.distance_info = Text(self.droneinfoFrame, height=t_height, width=t_width)
+        self.distance_info = Text(self.droneinfoFrame, height=1.5, width=38)
         self.distance_unit = tk.Label(self.droneinfoFrame, text="m", font = "arial 12 bold")
 
         self.distance_imlab.grid(row=0, column=3, sticky = tk.W)
         self.distance_info.grid(row=0, column=4, sticky = tk.W)
         self.distance_unit.grid(row=0, column=5, sticky= tk.W)
 
-        #WindInfo
+
         wind_png = os.path.join(media, "wind"+IMAGE_EXT)
         if os.path.exists(wind_png):
             self.wind_image = img_resize(wind_png, i_width, i_height)
         self.wind_imlab = tk.Label(self.droneinfoFrame, image=self.wind_image)
-        self.wind_info = Text(self.droneinfoFrame, height=t_height, width=t_width)
+        self.wind_info = Text(self.droneinfoFrame, height=1.5, width=38)
         self.wind_unit = tk.Label(self.droneinfoFrame, text="m/s", font = "arial 12 bold")
 
         self.wind_imlab.grid(row=0, column=6, sticky = tk.W)
         self.wind_info.grid(row=0, column=7, sticky = tk.W)
         self.wind_unit.grid(row=0, column=8, sticky= tk.W)
 
-        #WDirectionInfo
+
         direction_png = os.path.join(media, "direction"+IMAGE_EXT)
         if os.path.exists(direction_png):
             self.direction_image = img_resize(direction_png, i_width, i_height)
         self.direction_imlab = tk.Label(self.droneinfoFrame, image=self.direction_image)
-        self.direction_info = Text(self.droneinfoFrame, height=t_height, width=t_width)
+        self.direction_info = Text(self.droneinfoFrame, height=1.5, width=38)
 
         self.direction_imlab.grid(row=0, column=9, sticky = tk.W)
         self.direction_info.grid(row=0, column=10, sticky = tk.W)
@@ -497,10 +473,10 @@ if __name__ == '__main__':
             ver=platform.python_version(), arch=platform.architecture()[0]))
     logger.info("Tk {ver}".format(ver=tk.Tcl().eval('info patchlevel')))
     assert cef.__version__ >= "55.3", "CEF Python v55.3+ required to run this"
-    sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+    sys.excepthook = cef.ExceptHook
     root = tk.Tk()
     app = MainFrame(root)
-    # Tk must be initialized before CEF otherwise fatal error (Issue #306)
+
     cef.Initialize()
 
     app.mainloop()
